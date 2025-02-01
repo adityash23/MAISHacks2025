@@ -12,3 +12,6 @@ asl_model.h5
 
 # local training
 train.py
+
+# test video
+testVideo.mp4
