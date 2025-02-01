@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        
+        <title>trAnSLate</title>
+        <link rel="icon" type="image/png" href="">
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1, interactive-widget=resizes-content">
+
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap" rel="stylesheet">
+    </head>
+
+    <style>
+
+     :root {
+       --inputMode: "Gestures";
+       --outputMode: "Speech";
+     }
+     
+     body {
+       display: flex;
+       flex-direction: column;
+       justify-content: flex-start;
+       align-items: center;
+       height: 100vh;
+       width: 100vw;
+       margin: 0;
+       gap: 5vh;
+     }
+     #title {
+       width: min-content;
+       font-family: Fraunces;
+       font-weight: 200;
+       font-size: 2.1rem;
+       position: relative;
+       padding:0;
+       margin: 0;
+       span {
+         font-weight: 400;
+       }
+       &::before {
+         content: "";
+         width: 75%;
+         height: 103%;
+         position: absolute;
+         left: 12.5%;
+         border-bottom: 2px solid #111;
+         border-radius: 3px;
+       }
+     }
+
+     #info {
+       font-family: Fraunces;
+       font-size: 1.29rem;
+       font-weight: 150;
+       text-align: center;
+       font-style: italic;
+     }
+
+
+     #input::before, #output::before {
+       position: absolute;
+       top: calc(-2rem - 1.1vh);
+       font-size: 1.8rem;
+       font-weight: 425;
+       width: min-content;
+       margin: 0;
+       font-family: Fraunces;
+       
+     }
+
+     #input::before {content: var(--inputMode); }
+     #output::before {content: var(--outputMode) ;}
+     
+     #wrap-convert {
+       display: flex;
+       flex-direction: row;
+       justify-content: center;
+       width: 90vw;
+       gap: 2vw;
+       align-items: center;
+       align-content: center;
+       flex-grow: 0.6;
+       flex-wrap: wrap;
+     }
+
+     #swap {
+       width: 45px;
+       opacity: 0.8;
+       cursor: pointer;
+       background-image: url("SWAP.svg");
+       background-size: 100%;
+       height: 45px;
+       padding: 0;
+       background-color: transparent;
+       border: 0;
+       transition: opacity 0.1s;
+
+       &:hover {
+         opacity: 0.5;
+       }
+     }
+
+     #input, #output {
+       height: 50vh;
+       max-height: 60vh;
+       flex: 1 1 0px;
+       border: 1px solid #eee;
+       box-shadow: 0 0 4px #EFEFEF, 0 0 1px #DDD ;
+       border-color: #AAA;
+
+       padding: 4px;
+
+       border-radius: 10px;
+       font-family: Fraunces;
+       display: flex;
+       flex-direction: column;
+       position: relative;
+       align-items: center;
+
+       
+     }
+
+     #output {
+       background-color: #EEE;
+     }
+
+     #recordprompt {
+       margin-top: auto;
+       margin-bottom: auto;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       gap: 1vh;
+       
+       
+       
+       #record {
+         padding: 0;
+         border: 0;
+         background: transparent;
+         border: 3px solid black;
+         border-radius: 50%;
+
+         cursor: pointer;
+         width: 50px;
+         height: 50px;
+         transition: transform 0.1s;
+
+         display: flex;
+         justify-content: center;
+         align-items: center;
+
+         &:hover::before {
+           width: 65%;
+           height: 65%;
+
+         }
+
+         &::before {
+           background: hsl(3, 45%, 35%);
+           content: "";
+           width: 54%;
+           height: 54%;
+           display: block;
+           border-radius: 50%;
+
+           transition: transform 0.1s, width 0.1s ease-out, height 0.1s ease-out;
+         }
+       }
+     }
+     
+     #waveform {
+       position: relative;
+       margin-top: auto;
+       margin-bottom: auto;
+       width: 50px;
+       opacity: 0.7;
+     }
+
+     #playprompt {
+       margin-bottom: auto;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       gap: 1vh;
+
+
+       display: none;   
+     }
+
+     .prompt p {
+       font-weight: 300;
+       font-size: 0.85rem;
+       font-style: ;
+       margin: 0;
+       color: #888;
+     }
+     
+     #play {
+       padding: 0;
+       border: 0;
+       background: url("VOLUME.svg");
+       background-size: 100%;
+
+       cursor: pointer;
+       opacity: 0.8;
+       width: 30px;
+       height: 30px;
+
+       transition: transform 0.1s;
+
+     }
+
+     #stop {
+       padding: 0;
+       border: 0;
+       background-size: 100%;
+
+       transition: transform 0.1s;
+
+       background-color: transparent;
+
+       border: 2.5px solid black;
+       border-radius: 50%;
+       cursor: pointer;
+       width: 30px;
+       height: 30px;
+
+       justify-content: center;
+       align-items: center;
+
+       display: none;
+
+       &:hover::after {
+         width: 57%;
+         height: 57%;
+       }
+       &::after {
+         content: "";
+         width: 50%;
+         height: 50%;
+         display: block;
+         
+         border-radius: 2px;
+
+         transition: transform 0.1s, width 0.1s, height 0.1s;
+
+         background: hsl(3, 45%, 35%);
+
+       }
+     }
+
+     
+     .nudged, .nudged::after, .nudged::before {
+       transform: scale(0.95);
+     }
+     
+     video {
+       display: none;
+     }
+     #input.recording {
+       transition: height 0.25s ease-out, background 0.25s ease-out;
+background: #EEE;
+       height: var(--vidHeight);
+       #recordprompt {
+         display: none;
+       }
+
+       video {
+         display: block;
+         width: 100%;
+         height: 100%;
+       }
+
+       
+     }
+
+    </style>
+
+    <body>
+
+        <h1 id="title"> tr<span>A</span>n<span>S</span><span>L</span>ate </h1>
+
+
+
+        <div id="info"> Translate a sequence of letter signs into speech — and vice versa.  </div>
+
+        
+
+        <div id="wrap-convert">
+            
+           
+            <div id="input">
+
+                <div id="recordprompt" class="prompt">
+                    <button id="record"></button>
+                    <p> Click to begin recording </p>
+                </div>
+
+                <video id="livevid" autoplay="true"> </video>
+
+                <div id="stopprompt" class="prompt">
+
+                    <button id="stop"></button>
+                    <p> Click to end recording
+                </div>
+                
+            </div>
+            
+            <button id="swap"></button>
+
+            
+            <div id="output">
+                
+                <img id="waveform" src="WAVEFORM.svg">
+
+                <div id="playprompt" class="prompt">
+                    <button id="play"></button>
+                    <p> Replay response </p>
+                </div>
+
+                
+                
+            </div>
+        </div>
+    </body>
+
+
+    <script>
+
+
+
+     const RECORD = document.getElementById("record");
+     const SWAP = document.getElementById("swap");
+
+     const INPUT = document.getElementById("input");
+     const VIDEO = document.getElementById("livevid");
+
+     const PLAY = document.getElementById("play");
+
+     
+     SWAP.onclick = () => {
+       if ('speechSynthesis' in window) {
+         const synth = window.speechSynthesis;
+
+         const utterance = new SpeechSynthesisUtterance('My name is Giulia Alberini');
+
+         
+         const voices = synth.getVoices();
+         utterance.voice = voices[1];
+
+         utterance.rate = 1; // rate of speech
+
+         utterance.pitch = 1;
+         synth.speak(utterance);
+
+       } else {
+         console.log('Speech synthesis is not supported in this browser.');
+       }
+     }
+
+
+     RECORD.onclick = () => {
+       INPUT.classList.add("loading");
+       
+       navigator.mediaDevices
+                .getUserMedia({
+                  audio: false,
+                  video: true,
+                })
+                .then((stream) => {
+                  const videoTracks = stream.getVideoTracks();
+
+                  let ratio = stream.getVideoTracks()[0].getSettings().aspectRatio;
+
+                  let width = INPUT.clientWidth;
+
+                  console.log(ratio);
+                  console.log(`Using video device: ${videoTracks[0].label}`);
+                  stream.onremovetrack = () => {
+                    console.log("Stream ended");
+                  };
+
+                  document.documentElement.style.setProperty("--vidHeight", `${width / ratio}px`);
+                  VIDEO.srcObject = stream;
+                  INPUT.classList.add("recording");
+
+                })
+                .catch((error) => {
+                  if (error.name === "NotAllowedError") {
+                    console.error(
+                      "You need to grant this page permission to access your camera and microphone.",
+                    );
+                  } else {
+                    console.error(`getUserMedia error: ${error.name}`, error);
+                  }
+                });
+     }
+
+
+     document.querySelectorAll("button").forEach(b => {
+       b.addEventListener("pointerdown", (event) => {
+         event.target.classList.add("nudged");
+         event.target.addEventListener("pointerup", (event) => {
+           event.target.classList.remove("nudged");
+         });
+         
+       });
+     });
+    </script>
+</html>
+
+
