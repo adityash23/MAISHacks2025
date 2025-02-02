@@ -4,7 +4,7 @@
     <head>
         
         <title>trAnSLate</title>
-        <link rel="icon" type="image/png" href="">
+        <link rel="icon" type="image/png" href="ASL.svg">
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,initial-scale=1, interactive-widget=resizes-content">
@@ -17,10 +17,16 @@
 
     <style>
 
+     
      :root {
        --inputMode: "Gestures";
+       --inputDesc: "Sign letters to the camera...";
        --inputPrompt: "Click to begin recording";
+       --outputDesc: "...and hear them spoken!";
        --outputMode: "Speech";
+
+
+       --slBack: 2rem;
      }
      
      body {
@@ -36,41 +42,98 @@
      }
 
      #title {
-       width: min-content;
        font-family: Fraunces;
        font-weight: 200;
-       font-size: 2.1rem;
+       font-size: 2.7rem;
        position: relative;
        padding:0;
        margin: 0;
        margin-top: 1.9vh;
-       span {
+       transition: right 1.5s;
+       right: 0;
+
+       span {display: inline-block}
+       span.upper {
          font-weight: 400;
-       }
-       &::before {
-         content: "";
-         width: 75%;
-         height: 103%;
-         position: absolute;
-         left: 12.5%;
-         border-radius: 3px;
+         position: relative;
+         color: transparent;
+         &::before {
+           content: attr(data-val);
+           position: absolute;
+           color: black;
+           font-weight: 400;
+         }
        }
      }
+     #title.magic {
 
+       right: calc(0.5 * (var(--bigA) + var(--bigS) + var(--bigL)) - 4px);
+       span:nth-of-type(3) {
+         animation: shrinkInA 1.5s 0.1s  forwards;
+         &::before {
+           animation: goA 2s forwards; 
+         }
+       }
+       span:nth-of-type(5) {
+         animation: shrinkInS  1.3s 0.1s forwards;
+         &::before {
+           animation: goS 2s  forwards; 
+         }
+       }
+       span:nth-of-type(6) {
+         animation: shrinkInL  1.5s 0.1s forwards;
+         &::before {
+           animation: goL 2s forwards;
+         }
+       }
+     }
      
-     
-     #info {
-       font-family: Fraunces;
-       font-size: 1.29rem;
-       font-weight: 150;
-       text-align: center;
-       font-style: italic;
+
+     @keyframes shrinkInA {
+       from { min-width: var(--bigA); color: transparent;}
+       to {min-width: var(--smallA); color: black;}
+     }
+     @keyframes shrinkInS {
+       from { min-width: var(--bigS); color: transparent;}
+       to {min-width: var(--smallS); color: black;}
+     }
+     @keyframes shrinkInL {
+       from { min-width: var(--bigL); color: transparent;}
+       to {min-width: var(--smallL); color: black; }
      }
 
+     @keyframes goA {
+       from {left: 0;}
+       to {left: var(--acrForward);}
+     }
+
+     @keyframes goS {
+       from {left: 0;}
+       to {left: calc(var(--acrForward) - var(--slBack) + 4px);}
+     }
+     @keyframes goL {
+       from {left: 0;}
+       to {left: calc(var(--acrForward) - var(--slBack) + 8px);}
+     }
+
+
+     /*&::before {
+        content: "";
+        width: 75%;
+        height: 103%;
+        border-bottom: 1px solid black;
+        position: absolute;
+        left: 12.5%;
+        border-radius: 1px;
+        }
+      */
+     
+
+     
 
      #input::before, #output::before {
        position: absolute;
-       top: calc(-2rem - 1.1vh);
+       top: calc(-3rem - 1vh);
        font-size: 1.8rem;
        font-weight: 425;
        width: min-content;
@@ -78,20 +141,34 @@
        font-family: Fraunces;
        transition: transform 0.4s;
        z-index: -2;
-       
      }
 
-     #input.swapout::before {
-       transform: translateY(3rem) rotate(-20deg);
+     #input::after, #output::after {
+       position: absolute;
+       top: calc(-1rem - 1vh);
+       font-size: 1rem;
+       font-weight: 150;
+       font-style: italic;
+       width: auto;
+       margin: 0;
+       font-family: Fraunces;
+       transition: transform 0.4s;
+       z-index: -2;
      }
 
-     #output.swapout::before {
-       transform: translateY(3rem) rotate(20deg);
+     #input.swapout::before, #input.swapout::after {
+       transform: translateY(4rem) rotate(-20deg);
+     }
+
+     #output.swapout::before, #output.swapout::after  {
+       transform: translateY(4rem) rotate(20deg);
      }
      
 
      #input::before {content: var(--inputMode); }
-     #output::before {content: var(--outputMode) ;}
+     #input::after {content: var(--inputDesc); }
+     #output::before {content: var(--outputMode);}
+     #output::after {content: var(--outputDesc); }
      
      #wrap-convert {
        display: flex;
@@ -103,15 +180,16 @@
        align-content: center;
        flex-grow: 0.6;
        flex-wrap: wrap;
+       margin-top: 3vh;
      }
 
      #swap {
-       width: 45px;
+       width: 40px;
        opacity: 0.8;
        cursor: pointer;
        background-image: url("assets/SWAP.svg");
        background-size: 100%;
-       height: 45px;
+       height: 53.5px;
        padding: 0;
        background-color: transparent;
        border: 0;
@@ -127,7 +205,7 @@
        max-height: 60vh;
        max-width: 40vw;
        flex: 1 1 0px;
-       border: 1px solid #C2C2C2;
+       border: 1px solid #BBB;
        box-shadow: 0 0 4px #EFEFEF, 0 0 1px #DDD ;
        background: #FBFBFB;
 
@@ -151,35 +229,58 @@
        &::after { transition: opacity 0.1s; opacity: 0; }
 
        #record {
-         animation: waiting 1s infinite;
+         animation: waiting 0.9s infinite;
        }
      }
 
-     #input.recording #recordprompt {
+     #input.loadingmore #recordprompt::after {
+       opacity: 1;
+     }
+
+     .speechgestures .recording #record {
+       animation: wiggle 1.6s infinite !important;
+     }
+
+     @keyframes wiggle {
+       0% {rotate: 0;}
+       25% {rotate: 3deg;}
+       50% {rotate: 0deg;}
+       75% {rotate: -3deg;}
+       100% {rotate: 0deg}
+     }
+     
+     
+     .gesturesspeech #input.recording #recordprompt {
        position: absolute;
        flex-direction: row;
-       top: calc(15px + var(--vidHeight));
+       top: calc(clamp(1rem, 2vh + 1vw, 1.7rem) + var(--vidHeight));
        
        #record {
-         width: 30px;
-         height: 30px;
+         width: 33px;
+         height: 33px;
 
          &::before {
            border-radius: 3px;
          }
        }
 
-       &::after {transition-delay: 200ms;}
+       &::after {opacity: 0; animation: bringStopPrompt 0.2s 0.2s forwards; }
      }
      @keyframes waiting {
        0% {scale: 1;}
-       50% {scale: 0.8;}
+       50% {scale: 0.85;}
        100% {scale: 1;}
      }
 
+     @keyframes bringStopPrompt {
+       from {opacity: 0;}
+       to {opacity: 1;}
+     }
+
      #recordprompt {
-       margin-top: auto;
-       margin-bottom: auto;
+       position: absolute;
+       top: 50%;
+       transform: translateY(-50%);
        display: flex;
        flex-direction: column;
        align-items: center;
@@ -195,54 +296,85 @@
          font-family: Fraunces;
        }
        
-       #record {
-         padding: 0;
-         border: 0;
-         background: transparent;
-         border: 3px solid black;
+     }
+
+
+     .gesturesspeech #record {
+       padding: 0;
+       border: 0;
+       background: transparent;
+       border: 3px solid black;
+       border-radius: 50%;
+
+       cursor: pointer;
+       width: 50px;
+       height: 50px;
+       transition: transform 0.1s, top 0.4s, width 0.2s, height 0.2s, opacity 0.4s;
+
+       display: flex;
+       justify-content: center;
+       align-items: center;
+
+       position: relative;
+
+       &:hover::before, &:active::before {
+         width: 65%;
+         height: 65%;
+
+       }
+       &::before {
+         background: hsl(3, 45%, 42%);
+         content: "";
+         width: 54%;
+         height: 54%;
+         display: block;
          border-radius: 50%;
-
-         cursor: pointer;
-         width: 50px;
-         height: 50px;
-         transition: transform 0.1s, top 0.4s, width 0.2s, height 0.2s, border 0.3s;
-
-         display: flex;
-         justify-content: center;
-         align-items: center;
 
          position: relative;
 
-         &:hover::before, &:active::before {
-           width: 65%;
-           height: 65%;
-
-         }
-
-         &::before {
-           background: hsl(3, 45%, 42%);
-           content: "";
-           width: 54%;
-           height: 54%;
-           display: block;
-           border-radius: 50%;
-
-           position: relative;
-           
-
-           transition: transform 0.1s, width 0.1s ease-out, height 0.1s ease-out;
-         }
-
-         
+         transition: transform 0.1s, width 0.1s ease-out, height 0.1s ease-out;
        }
      }
-     
-     #waveform {
-       position: relative;
-       margin-top: auto;
-       margin-bottom: auto;
-       width: 50px;
+
+     .speechgestures #record {
+       background: url("assets/MIC.svg");
+       background-size: 100%;
+       width: 31.5px;
+       height: 50px;
+       padding: 0;
+       border: 0;
+       cursor: pointer;
+       transition: opacity 0.4s, filter 0.1s;
+       
+       &:hover {
+         filter: invert(0.3);
+       }
+     }
+
+     .swapout #record {
+       opacity: 0;
+     }
+
+
+     #hands, #waveform {position: absolute; top: 50%; transform: translateY(-50%); display: none; transition: opacity 0.4s; }
+
+     .swapout #hands, .swapout #waveform { opacity: 0 !important; }
+     .gesturesspeech #waveform {
+       display: block;
+      
+       width: 60px;
        opacity: 0.7;
+     }
+
+     .speechgestures #hands {
+       display: block;
+     
+       width: 60px;
+       opacity: 0.7;
+     }
+
+     .recording #waveform, .recording #hands {
+       opacity: 0;
      }
 
      #playprompt {
@@ -263,7 +395,10 @@
        color: #888;
        opacity: 1;
        transition: opacity 0.2s ease-out;
+       
      }
+
+     
      
      #play {
        padding: 0;
@@ -286,36 +421,62 @@
      
      video {
        display: none;
+       filter: grayscale(0); /* prevents black line */
      }
-     #input.recording {
+     .gesturesspeech #input.recording {
        transition: max-height 0.25s ease-out, max-width 0.25s ease-out;
        max-height: var(--vidHeight);
        max-width: var(--vidWidth);
 
-       video {
+       #livevid {
          display: block;
          width: 100%;
          height: 100%;
+         opacity: 1;
+
+         transition: opacity 0.3s;
+         &.terminate {
+           opacity: 0;
+         }
        }
 
        
      }
 
+     #text { display: none;}
+
+     .recording #text {
+       display: block;
+       font-weight: 500;
+       text-align: center;
+       margin-bottom: auto;
+       word-break: break-all;
+     }
+
+     #signbox { display: none; }
+
+    .speechgestures .viewing #signbox {
+       display: flex;
+       flex-direction: row;
+       flex-wrap: wrap;
+       gap: 2px;
+     }
     </style>
 
     <body>
 
         
-        <h1 id="title"> tr<span>A</span>n<span>S</span><span>L</span>ate </h1>
+        <h1 id="title">
 
+            <span>t</span><span>r</span><span class="upper" data-val="A">A</span><span>n</span><span class="upper" data-val="S">S</span><span class="upper" data-val="L">L</span><span>a</span><span>t</span><span>e</span>
+
+        </h1>
 
 
         
-        <div id="info"> Translate a sequence of letter signs into speech — and vice versa.  </div>
-
         
 
-        <div id="wrap-convert">
+        <div id="wrap-convert" class="gesturesspeech">
             
             
             <div id="input">
@@ -334,10 +495,15 @@
             <div id="output">
                 
                 <img id="waveform" src="assets/WAVEFORM.svg">
+                <img id="hands" src="assets/ASL.svg">
 
                 <div id="playprompt" class="prompt">
                     <button id="play"></button>
                 </div>
+
+                <div id="signbox"></div>
+
+                <div id="text"></div>
 
                 
                 
@@ -345,46 +511,142 @@
         </div>
     </body>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-
-
-
     <script>
 
+     const TITLE = document.getElementById("title");
+     const SPANS = TITLE.querySelectorAll("span");
+
      
+     let nMap = new Map();
+     let gapMap = new Map();
+
+
+     let acrForward = 0;
+
+     let sArray = Array.from(SPANS);
+
+     [sArray[2], sArray[4], sArray[5]].forEach( s => { document.documentElement.style.setProperty(`--big${s.innerText}`,  `${s.getBoundingClientRect().width}px`);
+     });
+     
+
+     setTimeout( () => {
+       for (let i=2; i < sArray.length; i++) {
+         s = sArray[i];
+         nMap.set(s.innerText, s);
+         let oldWidth = s.getBoundingClientRect().width;
+         
+         
+         s.innerText = s.innerText.toLowerCase();
+         s.style.fontWeight = 200;
+
+         newWidth = s.getBoundingClientRect().width;
+
+         s.style.minWidth = oldWidth;
+
+         gapMap.set(s, newWidth);
+         acrForward += newWidth;
+       }
+
+       [sArray[2], sArray[4], sArray[5]].forEach( s => { document.documentElement.style.setProperty(`--small${s.innerText.toUpperCase()}`, `${gapMap.get(s)}px`);
+       });
+
+
+       document.documentElement.style.setProperty("--acrForward", `${acrForward}px`);
+
+       document.documentElement.style.setProperty("--slBack", `${gapMap.get(nMap.get("n"))}px`);
+
+       TITLE.classList.add("magic");
+       
+     }, 800);
+
+     
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+
+    <script>
+     const URL = "https://teachablemachine.withgoogle.com/models/D5a-ucXZd/";
+
+     let model;
+     async function init() {
+       const modelURL = URL + "model.json";
+       const metadataURL = URL + "metadata.json";
+
+       // load the model and metadata
+       // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+       // or files from your local hard drive
+       // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+       model = await tmImage.load(modelURL, metadataURL);
+       maxPredictions = model.getTotalClasses();
+
+     }
+
+     init();
      const RECORD = document.getElementById("record");
      const SWAP = document.getElementById("swap");
 
+     const WRAP = document.getElementById("wrap-convert");
      const INPUT = document.getElementById("input");
      const OUTPUT = document.getElementById("output");
 
      const VIDEO = document.getElementById("livevid");
 
+     const TEXT = document.getElementById("text");
+
      const PLAY = document.getElementById("play");
-
+     const SIGNBOX = document.getElementById("signbox");
      
-
      let ratio = 1;
 
-     let model;
+     async function predictFrame(img) {
+       const prediction = await model.predict(img);
 
-     async function loadModel() {
-       tf.loadLayersModel('tfjs_model_fixed/model.json').then((m) => {
-         model = m;
-         model.summary();
-       }).catch((e) => {console.log(e)});
+       
+       let c = prediction.reduce( (a,b) => {
+         return (a.probability > b.probability) ? a : b
+       }).className;
+       
+
+       console.log(c);
+       addLetter(c);
+
+       return;
+
      }
+     let allow = true;
+     let lastChar = '';
+     let repeatCount = 0;
+     let repeatThreshold = 20;
 
-     loadModel();
+     function addLetter(c) {
+       if (c === lastChar) {
+         repeatCount++;
+       } else {
+         lastChar = c;
+         repeatCount = 1;
+         allow = true;
+       }
 
+       if (repeatCount < repeatThreshold || !allow) {
+         return;
+       }
 
-
+       if (c === "space") {
+         token = " ";
+       } else if ("ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(c)) {
+         token = (text.innerText.length > 0) ? c.toLowerCase() : c;
+       }
+       TEXT.innerText += token;
+       allow = false;
+     }
+     
      function speak(text) {
-       if ("speechsynthesis" in window) return;
        const SYNTH = window.speechSynthesis;
        const VOICES = SYNTH.getVoices();
 
-       const utterance = new SpeechSynthesisUtterance('My name is Giulia Alberini');
+       const utterance = new SpeechSynthesisUtterance(text);
        
        utterance.voice = VOICES[1];
 
@@ -394,14 +656,28 @@
        SYNTH.speak(utterance);    
      }
 
+     PLAY.onclick = () => {
+       speak(text.innerText);
+     };
 
      function swapTitles() {
        let root = window.getComputedStyle(document.documentElement);
 
-       [newInput, newOutput] = [ root.getPropertyValue("--outputMode"), root.getPropertyValue("--inputMode")];
+       [newInputTitle, newOutputTitle] = [ root.getPropertyValue("--outputMode"), root.getPropertyValue("--inputMode")];
+       newInputDesc = ( root.getPropertyValue("--inputDesc").includes("letters")) ? "'Speak into the mic...'" : "'Sign letters to the camera...'";
+       newOutputDesc = ( root.getPropertyValue("--outputDesc").includes("spoken")) ? "'...and see your words signed!'" : "'...and hear them spoken!'";
+       if (WRAP.classList.contains("gesturesspeech")) {
+         WRAP.classList.remove("gesturesspeech");
+         WRAP.classList.add("speechgestures");
+       } else {
+         WRAP.classList.remove("speechgestures");
+         WRAP.classList.add("gesturesspeech");
+       }
 
-       document.documentElement.style.setProperty("--inputMode", newInput);
-       document.documentElement.style.setProperty("--outputMode", newOutput);
+       document.documentElement.style.setProperty("--inputMode", newInputTitle);
+       document.documentElement.style.setProperty("--outputMode", newOutputTitle);
+       document.documentElement.style.setProperty("--inputDesc", newInputDesc);
+       document.documentElement.style.setProperty("--outputDesc", newOutputDesc);
 
        INPUT.classList.remove("swapout");
        OUTPUT.classList.remove("swapout");
@@ -410,6 +686,12 @@
      }
      
      SWAP.onclick = () => {
+
+       if (INPUT.classList.contains("recording") && WRAP.classList.contains("gesturesspeech")) {
+         stopVideoRecording();
+       } else if (INPUT.classList.contains("recording")) {
+         stopAudioRecording();
+       }
        
        INPUT.classList.add("swapout");
        OUTPUT.classList.add("swapout");
@@ -418,83 +700,152 @@
        
 
      };
+     let interval;
 
-     function captureFrames(vid) {
-       let preview = document.createElement("canvas");
-       var context = preview.getContext('2d')
-
-       let img = new Image();
-       
-       setInterval(function () {
-         context.drawImage(VIDEO, 0, 0, 640, 360);
-         img.src = preview.toDataURL();
-         img.width = VIDEO.getBoundingClientRect().width;
-         img.height = VIDEO.getBoundingClientRect().height;
-
-         predictFrame(img);
-       }, 500);
-     }
-
+     let preview = document.createElement("canvas");
+     var context = preview.getContext('2d')
      
-     function predictFrame(img) {
-       console.log(tf.browser.fromPixels(img));
+     function captureFrames(vid) {
+       interval = setInterval(function () {
+         context.drawImage(VIDEO, 0, 0, VIDEO.clientWidth, VIDEO.clientHeight);
+         
+         predictFrame(preview);
+       }, 100);
      }
 
-     let recorder;
+
+     function stopVideoRecording() {
+       clearInterval(interval);
+       stream.getTracks().forEach((track) => {
+         track.stop();
+       });
+       VIDEO.classList.add("terminate");
+       VIDEO.ontransitionend = () => {
+         VIDEO.ontransitionend = "";
+
+         INPUT.classList.remove("recording");
+         OUTPUT.classList.remove("recording");
+
+         VIDEO.classList.remove("terminate");
+         document.documentElement.style.setProperty("--inputPrompt", "'Click to begin recording'");
+
+         
+       }
+     }
+
+     function translateToGestures() {
+       OUTPUT.classList.add("viewing");
+       let chars = TEXT.innerText.split("");
+
+
+       chars.map( c => {
+         let img = new Image();
+         img.src = `assets/Sign_language_${c.toUpperCase()}.svg`;
+         return img;
+       });
+
+       SIGNBOX.append(...chars);
+  
+     }
+     
+     function stopAudioRecording() {
+       recognition.stop();
+       translateToGestures();
+       INPUT.classList.remove("recording");
+       OUTPUT.classList.remove("recording");
+     }
+
+     let stream;
+     let recognition = new webkitSpeechRecognition() || new SpeechRecognition();
+
+     recognition.lang = "en-GB";
+
+     recognition.interimResults = true;
+     recognition.continuous = true;
 
      RECORD.onclick = () => {
-       if (INPUT.classList.contains("recording")) {
-         recorder.ondataavailable = e => {
-           let video = document.createElement("video");
-           video.controls = true;
-           video.src = URL.createObjectURL(e.data);
-           video.style.display = 'block';
-           video.style.width = '100%'; // Adjust as needed
-           
-           // Append the video to the page
-           document.body.appendChild(video);
-         };
-         recorder.stop();
+       if (INPUT.classList.contains("recording") && WRAP.classList.contains("gesturesspeech")) {
+         clearInterval(interval);
+         stopVideoRecording();
+         return;
+       } else if (INPUT.classList.contains("recording")) {
+
+         stopAudioRecording();
+         return;
        }
 
-       INPUT.classList.add("loading");
 
-       INPUT.addEventListener("transitionend", () => {
-         document.documentElement.style.setProperty("--inputPrompt", "'Loading stream...'");
-         INPUT.classList.add("loadingmore");
-       });
+       if (WRAP.classList.contains("speechgestures")) {
+         recognition.start();
+
+         INPUT.classList.add("recording");
+         OUTPUT.classList.add("recording");
+
+         recognition.onresult = event => {
+           const result = event.results[event.results.length - 1][0].transcript;
+           TEXT.innerText = Array.from(event.results).map( x => x[0].transcript).join("");
+         };
+         recognition.onend = () => {
+           if (INPUT.classList.contains("recording")) {
+             recognition.start();
+           }
+         };
+
+         recognition.onerror = event => {
+           console.error('Speech recognition error:', event.error);
+         };
+
+         recognition.onnomatch = () => {
+           console.log('No speech was recognized.');
+         };
+
+         INPUT.classList.add("loading");
+
+         function wrapup() {
+           document.documentElement.style.setProperty("--inputPrompt", "'Click to end recording'");
+           INPUT.classList.remove("loading");
+           RECORD.parentNode.removeEventListener("transitionend", wrapup);
+         }
+         RECORD.parentNode.addEventListener("transitionend", wrapup);
+         
+         
+
+         
+       } else {
+
+         INPUT.classList.add("loading");
+         function handle() {
+           document.documentElement.style.setProperty("--inputPrompt", "'Loading stream...'");
+           INPUT.classList.add("loadingmore");
+           INPUT.removeEventListener("transitionend", handle);
+         }
+
+         INPUT.addEventListener("transitionend", handle);
          
          navigator.mediaDevices
                   .getUserMedia({
                     audio: false,
                     video: true,
                   })
-                  .then((stream) => {
+                  .then((s) => {
+                    stream = s;
                     const videoTracks = stream.getVideoTracks();
 
                     ratio = stream.getVideoTracks()[0].getSettings().aspectRatio;
                     resizeInput();
 
-                    console.log(`Using video device: ${videoTracks[0].label}`);
-                    stream.onremovetrack = () => {
-                      console.log("Stream ended");
-                    };
-
+                    
+                    
                     VIDEO.srcObject = stream;
                     document.documentElement.style.setProperty("--inputPrompt", "'Click to end recording'");
                     INPUT.classList.add("recording");
+                    OUTPUT.classList.add("recording");
 
                     INPUT.classList.remove("loading");
                     INPUT.classList.remove("loadingmore");
 
                     captureFrames();
                     
-                    recorder = new MediaRecorder(stream, {
-                      mimeType: 'video/mp4'
-                    });
-                    recorder.start();
-
-
                   })
                   .catch((error) => {
                     if (error.name === "NotAllowedError") {
@@ -505,48 +856,55 @@
                       console.error(`getUserMedia error: ${error.name}`, error);
                     }
                   });
+       }
      }
 
-         function resizeInput() {
-           let cardWidth = OUTPUT.clientWidth;
-           let cardHeight = OUTPUT.clientHeight;
 
-           let videoWidth, videoHeight;
+     function resizeInput() {
+       let cardWidth = OUTPUT.clientWidth;
+       let cardHeight = OUTPUT.clientHeight;
 
-           videoWidth = cardWidth;
-           videoHeight = cardWidth / ratio;
 
-           if (videoHeight > cardHeight) {
-             videoHeight = cardHeight;
-             videoWidth = cardHeight * ratio;
-           }
+       let videoWidth, videoHeight;
 
-           document.documentElement.style.setProperty("--vidWidth", `${videoWidth}px`);
-           document.documentElement.style.setProperty("--vidHeight", `${videoHeight}px`);
+       videoWidth = cardWidth;
+       videoHeight = cardWidth / ratio;
 
-         }
+       if (videoHeight > cardHeight) {
+         videoHeight = cardHeight;
+         videoWidth = cardHeight * ratio;
+       }
 
-         window.onresize = () => {
-           INPUT.style.transition = "none";
-           resizeInput();
-           INPUT.style.transition = "";
-         };
+       preview.width = videoWidth;
+       preview.height = videoHeight;
+
+       document.documentElement.style.setProperty("--vidWidth", `${videoWidth}px`);
+       document.documentElement.style.setProperty("--vidHeight", `${videoHeight}px`);
+     }
+
+     window.onresize = () => {
+       INPUT.style.transition = "none";
+       RECORD.parentNode.style.transition = "none";
+       resizeInput();
+       INPUT.style.transition = "";
+       RECORD.parentNode.style.transition = "";
+     };
+     
+     document.querySelectorAll("button").forEach(b => {
+       b.addEventListener("pointerdown", (event) => {
+         event.target.classList.add("nudged");
+         event.target.addEventListener("pointerup", (event) => {
+           event.target.classList.remove("nudged");
+         });
          
-         document.querySelectorAll("button").forEach(b => {
-           b.addEventListener("pointerdown", (event) => {
-             event.target.classList.add("nudged");
-             event.target.addEventListener("pointerup", (event) => {
-               event.target.classList.remove("nudged");
-             });
-             
-           });
-         });
+       });
+     });
 
-         document.addEventListener("pointerup", () => {
-           document.querySelectorAll(".nudged").forEach( n => {
-             n.classList.remove("nudged");
-           });
-         });
+     document.addEventListener("pointerup", () => {
+       document.querySelectorAll(".nudged").forEach( n => {
+         n.classList.remove("nudged");
+       });
+     });
     </script>
 </html>
 
