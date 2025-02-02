@@ -15,3 +15,7 @@ train.py
 
 # test video
 testVideo.mp4
+
+# testing model on video feed
+script.js
+testPage.html
