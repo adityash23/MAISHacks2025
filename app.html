@@ -19,11 +19,11 @@
 
      
      :root {
-       --inputMode: "Gestures";
-       --inputDesc: "Sign letters to the camera...";
+       --inputMode: "Speech";
+       --inputDesc: "Speak into the mic...";
        --inputPrompt: "Click to begin recording";
-       --outputDesc: "...and hear them spoken!";
-       --outputMode: "Speech";
+       --outputDesc: "...and see your words signed!";
+       --outputMode: "Gestures";
 
 
        --slBack: 2rem;
@@ -208,7 +208,6 @@
        border: 1px solid #BBB;
        box-shadow: 0 0 4px #EFEFEF, 0 0 1px #DDD ;
        background: #FBFBFB;
-
        padding: 1vmin;
 
        box-sizing: border-box;
@@ -286,6 +285,8 @@
        align-items: center;
        gap: 1vh;
 
+       z-index: 2;
+
        transition: top 0.2s ease-out;
        
        
@@ -361,30 +362,34 @@
      .swapout #hands, .swapout #waveform { opacity: 0 !important; }
      .gesturesspeech #waveform {
        display: block;
-      
+       
        width: 60px;
        opacity: 0.7;
      }
 
      .speechgestures #hands {
        display: block;
-     
+       
        width: 60px;
        opacity: 0.7;
      }
 
-     .recording #waveform, .recording #hands {
+     .recording #waveform, .viewing #waveform, .recording #hands,.viewing #hands {
        opacity: 0;
      }
 
      #playprompt {
-       margin-bottom: auto;
+       margin-top: auto;
        display: flex;
        flex-direction: column;
        align-items: center;
        gap: 1vh;
 
        display: none;   
+     }
+
+     .viewing #playprompt, .recordingcontent #playprompt {
+       display: block;
      }
 
 
@@ -445,7 +450,7 @@
 
      #text { display: none;}
 
-     .recording #text {
+     .gesturesspeech .recording #text, .gesturesspeech .viewing #text {
        display: block;
        font-weight: 500;
        text-align: center;
@@ -455,11 +460,51 @@
 
      #signbox { display: none; }
 
-    .speechgestures .viewing #signbox {
+     .swapout #signbox {
+       opacity: 0;
+     }
+
+     .speechgestures .recording #signbox, .speechgestures .viewing #signbox {
        display: flex;
        flex-direction: row;
        flex-wrap: wrap;
-       gap: 2px;
+       height: 100%;
+       gap: 5px;
+       scrollbar-width: none;
+
+       overflow: scroll;
+       align-items: center;
+       align-content: flex-start;
+       transition: opacity 0.4s;
+
+       span {
+         position: relative;
+         display: flex;
+         justify-content: center;
+
+         margin-bottom: 1.3rem;
+         
+         scale: 1;
+         transition: scale 0.2s;
+
+         @starting-style {
+           scale: 0;
+         }
+         
+         img {
+           width: 40px;
+           height: 40px;
+           
+         }
+         &::before {
+           content: attr(data-c);
+           position: absolute;
+           font-size: 1.2rem;
+           font-weight: 520;
+           bottom: -1rem;
+           
+         }
+       }
      }
     </style>
 
@@ -476,7 +521,7 @@
         
         
 
-        <div id="wrap-convert" class="gesturesspeech">
+        <div id="wrap-convert" class="speechgestures">
             
             
             <div id="input">
@@ -574,10 +619,7 @@
        const modelURL = URL + "model.json";
        const metadataURL = URL + "metadata.json";
 
-       // load the model and metadata
-       // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
-       // or files from your local hard drive
-       // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+
        model = await tmImage.load(modelURL, metadataURL);
        maxPredictions = model.getTotalClasses();
 
@@ -590,6 +632,8 @@
      const WRAP = document.getElementById("wrap-convert");
      const INPUT = document.getElementById("input");
      const OUTPUT = document.getElementById("output");
+
+     
 
      const VIDEO = document.getElementById("livevid");
 
@@ -618,7 +662,7 @@
      let allow = true;
      let lastChar = '';
      let repeatCount = 0;
-     let repeatThreshold = 20;
+     let repeatThreshold = 12;
 
      function addLetter(c) {
        if (c === lastChar) {
@@ -639,6 +683,8 @@
          token = (text.innerText.length > 0) ? c.toLowerCase() : c;
        }
        TEXT.innerText += token;
+
+       OUTPUT.classList.add("recordingcontent");
        allow = false;
      }
      
@@ -686,6 +732,7 @@
      }
      
      SWAP.onclick = () => {
+       OUTPUT.classList.remove("viewing");
 
        if (INPUT.classList.contains("recording") && WRAP.classList.contains("gesturesspeech")) {
          stopVideoRecording();
@@ -697,9 +744,8 @@
        OUTPUT.classList.add("swapout");
 
        INPUT.addEventListener("transitionend", swapTitles);
-       
 
-     };
+     }
      let interval;
 
      let preview = document.createElement("canvas");
@@ -725,34 +771,46 @@
 
          INPUT.classList.remove("recording");
          OUTPUT.classList.remove("recording");
+         OUTPUT.classList.remove("recordingcontent");
 
          VIDEO.classList.remove("terminate");
          document.documentElement.style.setProperty("--inputPrompt", "'Click to begin recording'");
 
+         OUTPUT.classList.add("viewing");
          
        }
      }
 
-     function translateToGestures() {
-       OUTPUT.classList.add("viewing");
-       let chars = TEXT.innerText.split("");
 
+     function translateToGestures(str) {
+       let chars = str.split("");
 
-       chars.map( c => {
+       let els = chars.map( c => {
+         let sp = document.createElement("span");
          let img = new Image();
-         img.src = `assets/Sign_language_${c.toUpperCase()}.svg`;
-         return img;
+         if (!"ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(c.toUpperCase())) {
+           img.src ='assets/SPACE.svg';
+         } else {
+           img.src = `assets/Sign_language_${c.toUpperCase()}.svg`;
+         }
+
+         sp.setAttribute("data-c", `${c}`);
+         sp.appendChild(img);
+
+         return sp;
        });
 
-       SIGNBOX.append(...chars);
-  
+       SIGNBOX.append(...els);
+       
      }
      
      function stopAudioRecording() {
        recognition.stop();
-       translateToGestures();
        INPUT.classList.remove("recording");
        OUTPUT.classList.remove("recording");
+       OUTPUT.classList.remove("viewing");
+
+       document.documentElement.style.setProperty("--inputPrompt", "'Click to begin recording'");
      }
 
      let stream;
@@ -764,12 +822,14 @@
      recognition.continuous = true;
 
      RECORD.onclick = () => {
+       OUTPUT.classList.remove("viewing");
+
        if (INPUT.classList.contains("recording") && WRAP.classList.contains("gesturesspeech")) {
          clearInterval(interval);
          stopVideoRecording();
          return;
        } else if (INPUT.classList.contains("recording")) {
-
+         OUTPUT.classList.add("viewing");
          stopAudioRecording();
          return;
        }
@@ -783,7 +843,13 @@
 
          recognition.onresult = event => {
            const result = event.results[event.results.length - 1][0].transcript;
-           TEXT.innerText = Array.from(event.results).map( x => x[0].transcript).join("");
+           let text = Array.from(event.results).map( x => x[0].transcript).join("");
+
+           if (text.length > SIGNBOX.children.length) {
+            translateToGestures(text.substring(SIGNBOX.children.length));
+
+           }
+           
          };
          recognition.onend = () => {
            if (INPUT.classList.contains("recording")) {
