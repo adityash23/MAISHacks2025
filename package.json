@@ -2,7 +2,7 @@
     "name": "translate_asl",
     "version": "1.0.0",
     "scripts": {
-      "server": "uvicorn fastapi_server:app --reload"
+      "server": "uvicorn app:app --reload"
     },
     "dependencies": {}
   }
