@@ -7,9 +7,6 @@ __pycache__/
 # VS Code settings
 .vscode/
 
-# model parameters
-asl_model.h5
-
 # local training
 train.py
 
