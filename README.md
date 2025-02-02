@@ -1,4 +1,3 @@
 # MAISHacks2025
-
-- Custom model training for ASL alphabets - trained on Kaggle and final model used locally [notebook link to be added]
-- Making a TensorFlow.js compatible version
+LINK: https://github.com/dpbarry/translateASL/settings/pages
+- Custom model training for ASL alphabets - final model used locally
