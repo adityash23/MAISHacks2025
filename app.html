@@ -19,6 +19,7 @@
 
      :root {
        --inputMode: "Gestures";
+       --inputPrompt: "Click to begin recording";
        --outputMode: "Speech";
      }
      
@@ -31,7 +32,9 @@
        width: 100vw;
        margin: 0;
        gap: 5vh;
+       overflow: hidden;
      }
+
      #title {
        width: min-content;
        font-family: Fraunces;
@@ -40,6 +43,7 @@
        position: relative;
        padding:0;
        margin: 0;
+       margin-top: 1.9vh;
        span {
          font-weight: 400;
        }
@@ -49,11 +53,12 @@
          height: 103%;
          position: absolute;
          left: 12.5%;
-         border-bottom: 2px solid #111;
          border-radius: 3px;
        }
      }
 
+     
+     
      #info {
        font-family: Fraunces;
        font-size: 1.29rem;
@@ -71,8 +76,19 @@
        width: min-content;
        margin: 0;
        font-family: Fraunces;
+       transition: transform 0.4s;
+       z-index: -2;
        
      }
+
+     #input.swapout::before {
+       transform: translateY(3rem) rotate(-20deg);
+     }
+
+     #output.swapout::before {
+       transform: translateY(3rem) rotate(20deg);
+     }
+     
 
      #input::before {content: var(--inputMode); }
      #output::before {content: var(--outputMode) ;}
@@ -93,7 +109,7 @@
        width: 45px;
        opacity: 0.8;
        cursor: pointer;
-       background-image: url("SWAP.svg");
+       background-image: url("assets/SWAP.svg");
        background-size: 100%;
        height: 45px;
        padding: 0;
@@ -109,25 +125,56 @@
      #input, #output {
        height: 50vh;
        max-height: 60vh;
+       max-width: 40vw;
        flex: 1 1 0px;
-       border: 1px solid #eee;
+       border: 1px solid #C2C2C2;
        box-shadow: 0 0 4px #EFEFEF, 0 0 1px #DDD ;
-       border-color: #AAA;
+       background: #FBFBFB;
 
-       padding: 4px;
+       padding: 1vmin;
 
+       box-sizing: border-box;
        border-radius: 10px;
        font-family: Fraunces;
        display: flex;
        flex-direction: column;
        position: relative;
        align-items: center;
-
-       
      }
 
      #output {
        background-color: #EEE;
+     }
+
+     
+     #input.loading #recordprompt {
+       &::after { transition: opacity 0.1s; opacity: 0; }
+
+       #record {
+         animation: waiting 1s infinite;
+       }
+     }
+
+     #input.recording #recordprompt {
+       position: absolute;
+       flex-direction: row;
+       top: calc(15px + var(--vidHeight));
+       
+       #record {
+         width: 30px;
+         height: 30px;
+
+         &::before {
+           border-radius: 3px;
+         }
+       }
+
+       &::after {transition-delay: 200ms;}
+     }
+     @keyframes waiting {
+       0% {scale: 1;}
+       50% {scale: 0.8;}
+       100% {scale: 1;}
      }
 
      #recordprompt {
@@ -137,8 +184,16 @@
        flex-direction: column;
        align-items: center;
        gap: 1vh;
+
+       transition: top 0.2s ease-out;
        
        
+       &::after {
+         content: var(--inputPrompt);
+         display: block;
+         margin: 0;
+         font-family: Fraunces;
+       }
        
        #record {
          padding: 0;
@@ -150,28 +205,35 @@
          cursor: pointer;
          width: 50px;
          height: 50px;
-         transition: transform 0.1s;
+         transition: transform 0.1s, top 0.4s, width 0.2s, height 0.2s, border 0.3s;
 
          display: flex;
          justify-content: center;
          align-items: center;
 
-         &:hover::before {
+         position: relative;
+
+         &:hover::before, &:active::before {
            width: 65%;
            height: 65%;
 
          }
 
          &::before {
-           background: hsl(3, 45%, 35%);
+           background: hsl(3, 45%, 42%);
            content: "";
            width: 54%;
            height: 54%;
            display: block;
            border-radius: 50%;
 
+           position: relative;
+           
+
            transition: transform 0.1s, width 0.1s ease-out, height 0.1s ease-out;
          }
+
+         
        }
      }
      
@@ -190,22 +252,23 @@
        align-items: center;
        gap: 1vh;
 
-
        display: none;   
      }
 
-     .prompt p {
+
+     .prompt::after {
        font-weight: 300;
        font-size: 0.85rem;
-       font-style: ;
        margin: 0;
        color: #888;
+       opacity: 1;
+       transition: opacity 0.2s ease-out;
      }
      
      #play {
        padding: 0;
        border: 0;
-       background: url("VOLUME.svg");
+       background: url("assets/VOLUME.svg");
        background-size: 100%;
 
        cursor: pointer;
@@ -216,46 +279,6 @@
        transition: transform 0.1s;
 
      }
-
-     #stop {
-       padding: 0;
-       border: 0;
-       background-size: 100%;
-
-       transition: transform 0.1s;
-
-       background-color: transparent;
-
-       border: 2.5px solid black;
-       border-radius: 50%;
-       cursor: pointer;
-       width: 30px;
-       height: 30px;
-
-       justify-content: center;
-       align-items: center;
-
-       display: none;
-
-       &:hover::after {
-         width: 57%;
-         height: 57%;
-       }
-       &::after {
-         content: "";
-         width: 50%;
-         height: 50%;
-         display: block;
-         
-         border-radius: 2px;
-
-         transition: transform 0.1s, width 0.1s, height 0.1s;
-
-         background: hsl(3, 45%, 35%);
-
-       }
-     }
-
      
      .nudged, .nudged::after, .nudged::before {
        transform: scale(0.95);
@@ -265,12 +288,9 @@
        display: none;
      }
      #input.recording {
-       transition: height 0.25s ease-out, background 0.25s ease-out;
-background: #EEE;
-       height: var(--vidHeight);
-       #recordprompt {
-         display: none;
-       }
+       transition: max-height 0.25s ease-out, max-width 0.25s ease-out;
+       max-height: var(--vidHeight);
+       max-width: var(--vidWidth);
 
        video {
          display: block;
@@ -285,32 +305,27 @@ background: #EEE;
 
     <body>
 
+        
         <h1 id="title"> tr<span>A</span>n<span>S</span><span>L</span>ate </h1>
 
 
 
+        
         <div id="info"> Translate a sequence of letter signs into speech — and vice versa.  </div>
 
         
 
         <div id="wrap-convert">
             
-           
+            
             <div id="input">
 
                 <div id="recordprompt" class="prompt">
                     <button id="record"></button>
-                    <p> Click to begin recording </p>
                 </div>
 
                 <video id="livevid" autoplay="true"> </video>
 
-                <div id="stopprompt" class="prompt">
-
-                    <button id="stop"></button>
-                    <p> Click to end recording
-                </div>
-                
             </div>
             
             <button id="swap"></button>
@@ -318,11 +333,10 @@ background: #EEE;
             
             <div id="output">
                 
-                <img id="waveform" src="WAVEFORM.svg">
+                <img id="waveform" src="assets/WAVEFORM.svg">
 
                 <div id="playprompt" class="prompt">
                     <button id="play"></button>
-                    <p> Replay response </p>
                 </div>
 
                 
@@ -331,88 +345,208 @@ background: #EEE;
         </div>
     </body>
 
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+
+
 
     <script>
 
-
-
+     
      const RECORD = document.getElementById("record");
      const SWAP = document.getElementById("swap");
 
      const INPUT = document.getElementById("input");
+     const OUTPUT = document.getElementById("output");
+
      const VIDEO = document.getElementById("livevid");
 
      const PLAY = document.getElementById("play");
 
      
-     SWAP.onclick = () => {
-       if ('speechSynthesis' in window) {
-         const synth = window.speechSynthesis;
 
-         const utterance = new SpeechSynthesisUtterance('My name is Giulia Alberini');
+     let ratio = 1;
 
-         
-         const voices = synth.getVoices();
-         utterance.voice = voices[1];
+     let model;
 
-         utterance.rate = 1; // rate of speech
-
-         utterance.pitch = 1;
-         synth.speak(utterance);
-
-       } else {
-         console.log('Speech synthesis is not supported in this browser.');
-       }
+     async function loadModel() {
+       tf.loadLayersModel('tfjs_model_fixed/model.json').then((m) => {
+         model = m;
+         model.summary();
+       }).catch((e) => {console.log(e)});
      }
 
+     loadModel();
+
+
+
+     function speak(text) {
+       if ("speechsynthesis" in window) return;
+       const SYNTH = window.speechSynthesis;
+       const VOICES = SYNTH.getVoices();
+
+       const utterance = new SpeechSynthesisUtterance('My name is Giulia Alberini');
+       
+       utterance.voice = VOICES[1];
+
+       utterance.rate = 1; 
+
+       utterance.pitch = 1;
+       SYNTH.speak(utterance);    
+     }
+
+
+     function swapTitles() {
+       let root = window.getComputedStyle(document.documentElement);
+
+       [newInput, newOutput] = [ root.getPropertyValue("--outputMode"), root.getPropertyValue("--inputMode")];
+
+       document.documentElement.style.setProperty("--inputMode", newInput);
+       document.documentElement.style.setProperty("--outputMode", newOutput);
+
+       INPUT.classList.remove("swapout");
+       OUTPUT.classList.remove("swapout");
+
+       INPUT.removeEventListener("transitionend", swapTitles);
+     }
+     
+     SWAP.onclick = () => {
+       
+       INPUT.classList.add("swapout");
+       OUTPUT.classList.add("swapout");
+
+       INPUT.addEventListener("transitionend", swapTitles);
+       
+
+     };
+
+     function captureFrames(vid) {
+       let preview = document.createElement("canvas");
+       var context = preview.getContext('2d')
+
+       let img = new Image();
+       
+       setInterval(function () {
+         context.drawImage(VIDEO, 0, 0, 640, 360);
+         img.src = preview.toDataURL();
+         img.width = VIDEO.getBoundingClientRect().width;
+         img.height = VIDEO.getBoundingClientRect().height;
+
+         predictFrame(img);
+       }, 500);
+     }
+
+     
+     function predictFrame(img) {
+       console.log(tf.browser.fromPixels(img));
+     }
+
+     let recorder;
 
      RECORD.onclick = () => {
+       if (INPUT.classList.contains("recording")) {
+         recorder.ondataavailable = e => {
+           let video = document.createElement("video");
+           video.controls = true;
+           video.src = URL.createObjectURL(e.data);
+           video.style.display = 'block';
+           video.style.width = '100%'; // Adjust as needed
+           
+           // Append the video to the page
+           document.body.appendChild(video);
+         };
+         recorder.stop();
+       }
+
        INPUT.classList.add("loading");
-       
-       navigator.mediaDevices
-                .getUserMedia({
-                  audio: false,
-                  video: true,
-                })
-                .then((stream) => {
-                  const videoTracks = stream.getVideoTracks();
 
-                  let ratio = stream.getVideoTracks()[0].getSettings().aspectRatio;
+       INPUT.addEventListener("transitionend", () => {
+         document.documentElement.style.setProperty("--inputPrompt", "'Loading stream...'");
+         INPUT.classList.add("loadingmore");
+       });
+         
+         navigator.mediaDevices
+                  .getUserMedia({
+                    audio: false,
+                    video: true,
+                  })
+                  .then((stream) => {
+                    const videoTracks = stream.getVideoTracks();
 
-                  let width = INPUT.clientWidth;
+                    ratio = stream.getVideoTracks()[0].getSettings().aspectRatio;
+                    resizeInput();
 
-                  console.log(ratio);
-                  console.log(`Using video device: ${videoTracks[0].label}`);
-                  stream.onremovetrack = () => {
-                    console.log("Stream ended");
-                  };
+                    console.log(`Using video device: ${videoTracks[0].label}`);
+                    stream.onremovetrack = () => {
+                      console.log("Stream ended");
+                    };
 
-                  document.documentElement.style.setProperty("--vidHeight", `${width / ratio}px`);
-                  VIDEO.srcObject = stream;
-                  INPUT.classList.add("recording");
+                    VIDEO.srcObject = stream;
+                    document.documentElement.style.setProperty("--inputPrompt", "'Click to end recording'");
+                    INPUT.classList.add("recording");
 
-                })
-                .catch((error) => {
-                  if (error.name === "NotAllowedError") {
-                    console.error(
-                      "You need to grant this page permission to access your camera and microphone.",
-                    );
-                  } else {
-                    console.error(`getUserMedia error: ${error.name}`, error);
-                  }
-                });
+                    INPUT.classList.remove("loading");
+                    INPUT.classList.remove("loadingmore");
+
+                    captureFrames();
+                    
+                    recorder = new MediaRecorder(stream, {
+                      mimeType: 'video/mp4'
+                    });
+                    recorder.start();
+
+
+                  })
+                  .catch((error) => {
+                    if (error.name === "NotAllowedError") {
+                      console.error(
+                        "You need to grant this page permission to access your camera and microphone.",
+                      );
+                    } else {
+                      console.error(`getUserMedia error: ${error.name}`, error);
+                    }
+                  });
      }
 
+         function resizeInput() {
+           let cardWidth = OUTPUT.clientWidth;
+           let cardHeight = OUTPUT.clientHeight;
 
-     document.querySelectorAll("button").forEach(b => {
-       b.addEventListener("pointerdown", (event) => {
-         event.target.classList.add("nudged");
-         event.target.addEventListener("pointerup", (event) => {
-           event.target.classList.remove("nudged");
-         });
+           let videoWidth, videoHeight;
+
+           videoWidth = cardWidth;
+           videoHeight = cardWidth / ratio;
+
+           if (videoHeight > cardHeight) {
+             videoHeight = cardHeight;
+             videoWidth = cardHeight * ratio;
+           }
+
+           document.documentElement.style.setProperty("--vidWidth", `${videoWidth}px`);
+           document.documentElement.style.setProperty("--vidHeight", `${videoHeight}px`);
+
+         }
+
+         window.onresize = () => {
+           INPUT.style.transition = "none";
+           resizeInput();
+           INPUT.style.transition = "";
+         };
          
-       });
-     });
+         document.querySelectorAll("button").forEach(b => {
+           b.addEventListener("pointerdown", (event) => {
+             event.target.classList.add("nudged");
+             event.target.addEventListener("pointerup", (event) => {
+               event.target.classList.remove("nudged");
+             });
+             
+           });
+         });
+
+         document.addEventListener("pointerup", () => {
+           document.querySelectorAll(".nudged").forEach( n => {
+             n.classList.remove("nudged");
+           });
+         });
     </script>
 </html>
 
