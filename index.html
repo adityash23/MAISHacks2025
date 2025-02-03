@@ -50,50 +50,50 @@
        transition: right 1.75s;
        right: 0;
        cursor: pointer;
-     }
-
-     span {
-       display: inline-block;
-     }
-
-     span.upper {
-       font-weight: 470;
-       position: relative;
-     }
-
-     span.upper::before {
-       content: attr(data-val);
-       position: absolute;
-       color: black;
-       font-weight: 470;
-       left: 0;
-       transition: left 1.75s;
-     }
-     span:nth-of-type(3) {
-       color: transparent;
-     }
-     span:nth-of-type(5) {
-       color: transparent;
-     }
-     span:nth-of-type(6) {
-       color: transparent;
-     }
-
-     
-     #title.computed {
+       
        span {
-         transition: min-width 1.75s, color 1.75s, left 1.75s;
+         display: inline-block;
+       }
+
+       span.upper {
+         font-weight: 470;
+         position: relative;
+       }
+
+       span.upper::before {
+         content: attr(data-val);
+         position: absolute;
+         color: black;
+         font-weight: 470;
+         left: 0;
+         transition: left 1.75s;
        }
        span:nth-of-type(3) {
-         min-width: var(--bigA);
+         color: transparent;
        }
        span:nth-of-type(5) {
-         min-width: var(--bigS);
+         color: transparent;
        }
        span:nth-of-type(6) {
-         min-width: var(--bigL);
+         color: transparent;
        }
 
+       
+       &.computed {
+         span {
+           transition: min-width 1.75s, color 1.75s, left 1.75s;
+         }
+         span:nth-of-type(3) {
+           min-width: var(--bigA);
+         }
+         span:nth-of-type(5) {
+           min-width: var(--bigS);
+         }
+         span:nth-of-type(6) {
+           min-width: var(--bigL);
+         }
+
+       }
      }
 
      #title.magic {
@@ -211,6 +211,7 @@
      }
      #output {
        background-color: #EEE;
+       padding: 1vmin;
      }
 
      
@@ -847,6 +848,7 @@
 
 
      function translateToGestures(str) {
+       
        let chars = str.split("");
 
        let els = chars.map( c => {
@@ -908,6 +910,7 @@
          OUTPUT.classList.add("recording");
 
          recognition.onresult = event => {
+           console.log(event);
            const result = event.results[event.results.length - 1][0].transcript;
            let text = Array.from(event.results).map( x => x[0].transcript).join("");
 
