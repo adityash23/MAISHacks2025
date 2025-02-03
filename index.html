@@ -3,8 +3,8 @@
 <html lang="en">
     <head>
         
-        <title>trAnSLate</title>
-        <link rel="icon" type="image/png" href="ASL.svg">
+        <title>translateASL</title>
+        <link rel="icon" type="image/svg" href="ASL.svg">
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,initial-scale=1, interactive-widget=resizes-content">
@@ -13,6 +13,9 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap" rel="stylesheet">
+
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap" rel="stylesheet">
+
     </head>
 
     <style>
@@ -21,7 +24,7 @@
      :root {
        --inputMode: "Speech";
        --inputDesc: "Speak into the mic...";
-       --inputPrompt: "Click to begin recording";
+       --inputPrompt: "Begin recording";
        --outputDesc: "...and see your words signed!";
        --outputMode: "Gestures";
 
@@ -43,7 +46,7 @@
 
      #title {
        font-family: Fraunces;
-       font-weight: 200;
+       font-weight: 100;
        font-size: 2.7rem;
        position: relative;
        padding:0;
@@ -54,34 +57,34 @@
 
        span {display: inline-block}
        span.upper {
-         font-weight: 400;
+         font-weight: 470;
          position: relative;
          color: transparent;
          &::before {
            content: attr(data-val);
            position: absolute;
            color: black;
-           font-weight: 400;
+           font-weight: 470;
          }
        }
      }
      #title.magic {
 
-       right: calc(0.5 * (var(--bigA) + var(--bigS) + var(--bigL)) - 4px);
+       right: calc(0.5 * (var(--bigA) + var(--bigS) + var(--bigL)));
        span:nth-of-type(3) {
-         animation: shrinkInA 1.5s 0.1s  forwards;
+         animation: shrinkInA 2s forwards;
          &::before {
            animation: goA 2s forwards; 
          }
        }
        span:nth-of-type(5) {
-         animation: shrinkInS  1.3s 0.1s forwards;
+         animation: shrinkInS 2s forwards;
          &::before {
            animation: goS 2s  forwards; 
          }
        }
        span:nth-of-type(6) {
-         animation: shrinkInL  1.5s 0.1s forwards;
+         animation: shrinkInL 2s forwards;
          &::before {
            animation: goL 2s forwards;
          }
@@ -104,16 +107,16 @@
 
      @keyframes goA {
        from {left: 0;}
-       to {left: var(--acrForward);}
+       to {left: var(--aForward);}
      }
 
      @keyframes goS {
        from {left: 0;}
-       to {left: calc(var(--acrForward) - var(--slBack) + 4px);}
+       to {left: calc(var(--sForward));}
      }
      @keyframes goL {
        from {left: 0;}
-       to {left: calc(var(--acrForward) - var(--slBack) + 8px);}
+       to {left: calc(var(--lForward));}
      }
 
 
@@ -149,6 +152,7 @@
        font-size: 1rem;
        font-weight: 150;
        font-style: italic;
+       white-space: nowrap;
        width: auto;
        margin: 0;
        font-family: Fraunces;
@@ -205,8 +209,9 @@
        max-height: 60vh;
        max-width: 40vw;
        flex: 1 1 0px;
-       border: 1px solid #BBB;
-       box-shadow: 0 0 4px #EFEFEF, 0 0 1px #DDD ;
+       border: 1px solid #C3C3C3;
+       box-shadow: 0 0 3px #f4f4f4, 0 0 2px #f0f0f0, 0 0 1px #e5e5e5;
+
        background: #FBFBFB;
        padding: 1vmin;
 
@@ -259,7 +264,7 @@
          height: 33px;
 
          &::before {
-           border-radius: 3px;
+           border-radius: 1.5px;
          }
        }
 
@@ -287,13 +292,15 @@
 
        z-index: 2;
 
-       transition: top 0.2s ease-out;
+       transition: top 0.38s ease-out;
        
        
        &::after {
          content: var(--inputPrompt);
          display: block;
          margin: 0;
+         white-space: nowrap;
+
          font-family: Fraunces;
        }
        
@@ -510,13 +517,11 @@
 
     <body>
 
-        
         <h1 id="title">
 
             <span>t</span><span>r</span><span class="upper" data-val="A">A</span><span>n</span><span class="upper" data-val="S">S</span><span class="upper" data-val="L">L</span><span>a</span><span>t</span><span>e</span>
 
         </h1>
-
 
         
         
@@ -557,22 +562,24 @@
     </body>
 
     <script>
-
      const TITLE = document.getElementById("title");
      const SPANS = TITLE.querySelectorAll("span");
 
      
      let nMap = new Map();
      let gapMap = new Map();
+     let bigGapMap = new Map();
 
-
-     let acrForward = 0;
+     let aForward = 0;
+     let sForward = 0;
+     let lForward = 0;
 
      let sArray = Array.from(SPANS);
 
-     [sArray[2], sArray[4], sArray[5]].forEach( s => { document.documentElement.style.setProperty(`--big${s.innerText}`,  `${s.getBoundingClientRect().width}px`);
+     [sArray[2], sArray[4], sArray[5]].forEach( s => {
+       document.documentElement.style.setProperty(`--big${s.innerText}`,  `${s.getBoundingClientRect().width}px`);
+       bigGapMap.set(s.innerText, s.getBoundingClientRect().width);
      });
-     
 
      setTimeout( () => {
        for (let i=2; i < sArray.length; i++) {
@@ -582,30 +589,39 @@
          
          
          s.innerText = s.innerText.toLowerCase();
-         s.style.fontWeight = 200;
+         s.style.fontWeight = 100;
 
          newWidth = s.getBoundingClientRect().width;
 
          s.style.minWidth = oldWidth;
 
          gapMap.set(s, newWidth);
-         acrForward += newWidth;
+         aForward += newWidth;
+         if (i >= 4) sForward += newWidth;
+         if (i >= 5) lForward += newWidth;
+
+         console.log(aForward, sForward, lForward);
        }
 
        [sArray[2], sArray[4], sArray[5]].forEach( s => { document.documentElement.style.setProperty(`--small${s.innerText.toUpperCase()}`, `${gapMap.get(s)}px`);
        });
 
 
-       document.documentElement.style.setProperty("--acrForward", `${acrForward}px`);
 
-       document.documentElement.style.setProperty("--slBack", `${gapMap.get(nMap.get("n"))}px`);
+       sForward += bigGapMap.get("A");
+       lForward += bigGapMap.get("A");
+       lForward += bigGapMap.get("S");
+
+       
+       
+       document.documentElement.style.setProperty("--aForward", `${aForward}px`);
+       document.documentElement.style.setProperty("--sForward", `${sForward}px`);
+       document.documentElement.style.setProperty("--lForward", `${lForward}px`);
+
 
        TITLE.classList.add("magic");
        
      }, 800);
-
-     
-
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
@@ -632,7 +648,8 @@
      const WRAP = document.getElementById("wrap-convert");
      const INPUT = document.getElementById("input");
      const OUTPUT = document.getElementById("output");
-
+     const CANRECOGNIZE = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+     
      
 
      const VIDEO = document.getElementById("livevid");
@@ -707,6 +724,7 @@
      };
 
      function swapTitles() {
+
        let root = window.getComputedStyle(document.documentElement);
 
        [newInputTitle, newOutputTitle] = [ root.getPropertyValue("--outputMode"), root.getPropertyValue("--inputMode")];
@@ -775,7 +793,7 @@
          OUTPUT.classList.remove("recordingcontent");
 
          VIDEO.classList.remove("terminate");
-         document.documentElement.style.setProperty("--inputPrompt", "'Click to begin recording'");
+         document.documentElement.style.setProperty("--inputPrompt", "'Begin recording'");
 
          OUTPUT.classList.add("viewing");
          
@@ -811,7 +829,7 @@
        OUTPUT.classList.remove("recording");
        OUTPUT.classList.remove("viewing");
 
-       document.documentElement.style.setProperty("--inputPrompt", "'Click to begin recording'");
+       document.documentElement.style.setProperty("--inputPrompt", "'Begin recording'");
      }
 
      let stream;
@@ -847,7 +865,7 @@
            let text = Array.from(event.results).map( x => x[0].transcript).join("");
 
            if (text.length > SIGNBOX.children.length) {
-            translateToGestures(text.substring(SIGNBOX.children.length));
+             translateToGestures(text.substring(SIGNBOX.children.length));
 
            }
            
@@ -869,7 +887,7 @@
          INPUT.classList.add("loading");
 
          function wrapup() {
-           document.documentElement.style.setProperty("--inputPrompt", "'Click to end recording'");
+           document.documentElement.style.setProperty("--inputPrompt", "'Stop recording'");
            INPUT.classList.remove("loading");
            RECORD.parentNode.removeEventListener("transitionend", wrapup);
          }
@@ -904,15 +922,16 @@
                     
                     
                     VIDEO.srcObject = stream;
-                    document.documentElement.style.setProperty("--inputPrompt", "'Click to end recording'");
+                    document.documentElement.style.setProperty("--inputPrompt", "'Stop recording'");
                     INPUT.classList.add("recording");
                     OUTPUT.classList.add("recording");
 
                     INPUT.classList.remove("loading");
                     INPUT.classList.remove("loadingmore");
 
-                    captureFrames();
-                    
+                    setTimeout( () => {
+                      captureFrames();
+                    }, 300);
                   })
                   .catch((error) => {
                     if (error.name === "NotAllowedError") {
@@ -974,5 +993,4 @@
      });
     </script>
 </html>
-
 

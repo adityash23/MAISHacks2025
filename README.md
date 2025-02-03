@@ -1,3 +1,6 @@
-# MAISHacks2025
+# translateASL
+
 LINK: [https://github.com/dpbarry/translateASL/settings/pages](https://dpbarry.github.io/translateASL/)
-- Custom model training for ASL alphabets - final model used locally
+
+
+WIP. Currently only supports finger signs; video interpretation is minimially accurate. 
