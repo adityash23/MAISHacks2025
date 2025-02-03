@@ -22,11 +22,9 @@
      
      :root {
        --inputMode: "Speech";
-       --inputDesc: "Speak into the mic...";
        --inputPrompt: "Begin recording";
 
        --outputMode: "Gestures";
-       --outputDesc: "...and see your words signed!";
      }
      
      body {
@@ -44,7 +42,7 @@
      #title {
        font-family: Fraunces;
        font-weight: 100;
-       font-size: 2.7rem;
+       font-size: 2.8rem;
        position: relative;
        padding: 0;
        margin: 0;
@@ -56,7 +54,6 @@
 
      span {
        display: inline-block;
-       transition: min-width 1.75s, color 1.75s, left 1.75s;
      }
 
      span.upper {
@@ -72,19 +69,29 @@
        left: 0;
        transition: left 1.75s;
      }
+     span:nth-of-type(3) {
+       color: transparent;
+     }
+     span:nth-of-type(5) {
+       color: transparent;
+     }
+     span:nth-of-type(6) {
+       color: transparent;
+     }
 
+     
      #title.computed {
+       span {
+         transition: min-width 1.75s, color 1.75s, left 1.75s;
+       }
        span:nth-of-type(3) {
          min-width: var(--bigA);
-         color: transparent;
        }
        span:nth-of-type(5) {
          min-width: var(--bigS);
-         color: transparent;
        }
        span:nth-of-type(6) {
          min-width: var(--bigL);
-         color: transparent;
        }
 
      }
@@ -121,9 +128,7 @@
      }
 
 
-
-     #input::before, #output::before,
-     #input::after, #output::after {
+     #input::before, #output::before {
        position: absolute;
        margin: 0;
        font-family: Fraunces;
@@ -133,26 +138,14 @@
 
      /* stream headers */
      #input::before, #output::before {
-       top: calc(-3rem - 1vh);
-       font-size: 1.8rem;
+       top: calc(-1.5 * clamp(1.5rem, 5vmin, 2.1rem));
+       font-size: clamp(1.5rem, 5vmin, 2.1rem);
        font-weight: 425;
        width: min-content;
      }
 
-     /* stream info */
-     #input::after, #output::after {
-       top: calc(-1rem - 1vh);
-       font-size: 1rem;
-       font-weight: 150;
-       font-style: italic;
-       white-space: nowrap;
-       width: auto;
-     }
-
      #input::before {content: var(--inputMode); }
-     #input::after {content: var(--inputDesc); }
      #output::before {content: var(--outputMode);}
-     #output::after {content: var(--outputDesc); }
      
      #input.swapout::before, #input.swapout::after {
        transform: translateY(4.5rem) rotate(-20deg);
@@ -201,7 +194,7 @@
        border: 1px solid #C3C3C3;
        box-shadow: 0 0 3px #f4f4f4, 0 0 2px #f0f0f0, 0 0 1px #e5e5e5;
 
-       padding: 1vmin;
+       padding: 0;
 
        box-sizing: border-box;
        border-radius: 10px;
@@ -450,15 +443,15 @@
 
          cursor: pointer;
          opacity: 0.8;
-         width: 30px;
-         height: 30px;
+         width: 50px;
+         height: 50px;
 
          transition: transform 0.1s;
 
        }
      }
 
-     .viewing #playprompt, .recordingcontent #playprompt {
+     .gesturesspeech .viewing #playprompt, .gesturesspeech .recordingcontent #playprompt {
        display: block;
      }
      
@@ -470,17 +463,20 @@
      }
 
      
-     .gesturesspeech #input.recording {
+     .gesturesspeech #input.recording, .gesturesspeech #input.viewing {
        transition: max-height 0.25s ease-out, max-width 0.25s ease-out;
        max-height: var(--vidHeight);
        max-width: var(--vidWidth);
+     }
 
+     .gesturesspeech #input.recording {
        #livevid {
          display: block;
          width: 100%;
          height: 100%;
          opacity: 1;
 
+         border-radius: 10px;
          transition: opacity 0.3s;
          &.terminate {
            opacity: 0;
@@ -493,6 +489,7 @@
      .gesturesspeech .recording #text, .gesturesspeech .viewing #text {
        display: block;
        font-weight: 500;
+       font-size: 1.5rem;
        text-align: center;
        margin-bottom: auto;
        word-break: break-all;
@@ -639,8 +636,6 @@
          aForward += newWidth;
          if (i >= 4) sForward += newWidth;
          if (i >= 5) lForward += newWidth;
-
-         console.log(aForward, sForward, lForward);
        }
 
        [sArray[2], sArray[4], sArray[5]].forEach( s => { document.documentElement.style.setProperty(`--small${s.innerText.toUpperCase()}`, `${gapMap.get(s)}px`);
@@ -662,6 +657,7 @@
 
 
        setTimeout( () => {
+
          TITLE.classList.add("magic");
        }, 20);
 
@@ -772,8 +768,7 @@
        let root = window.getComputedStyle(document.documentElement);
 
        [newInputTitle, newOutputTitle] = [ root.getPropertyValue("--outputMode"), root.getPropertyValue("--inputMode")];
-       newInputDesc = ( root.getPropertyValue("--inputDesc").includes("letters")) ? "'Speak into the mic...'" : "'Sign letters to the camera...'";
-       newOutputDesc = ( root.getPropertyValue("--outputDesc").includes("spoken")) ? "'...and see your words signed!'" : "'...and hear them spoken!'";
+       
        if (WRAP.classList.contains("gesturesspeech")) {
          WRAP.classList.remove("gesturesspeech");
          WRAP.classList.add("speechgestures");
@@ -784,8 +779,7 @@
 
        document.documentElement.style.setProperty("--inputMode", newInputTitle);
        document.documentElement.style.setProperty("--outputMode", newOutputTitle);
-       document.documentElement.style.setProperty("--inputDesc", newInputDesc);
-       document.documentElement.style.setProperty("--outputDesc", newOutputDesc);
+       
 
        INPUT.classList.remove("swapout");
        OUTPUT.classList.remove("swapout");
@@ -841,9 +835,14 @@
          VIDEO.classList.remove("terminate");
          document.documentElement.style.setProperty("--inputPrompt", "'Begin recording'");
 
+         INPUT.classList.add("viewing");
          OUTPUT.classList.add("viewing");
-         
-       }
+         document.documentElement.style.setProperty("--vidWidth", `40vw`);
+         document.documentElement.style.setProperty("--vidHeight", `60vh`);
+         ratio = 1;
+       };
+       window.onresize = "";
+       
      }
 
 
@@ -873,7 +872,6 @@
        recognition.stop();
        INPUT.classList.remove("recording");
        OUTPUT.classList.remove("recording");
-       OUTPUT.classList.remove("viewing");
 
        document.documentElement.style.setProperty("--inputPrompt", "'Begin recording'");
      }
@@ -893,10 +891,12 @@
          clearInterval(interval);
          stopVideoRecording();
          return;
-       } else if (INPUT.classList.contains("recording")) {
+       } else if (INPUT.classList.contains("recording") && !OUTPUT.classList.contains("viewing")) {
          OUTPUT.classList.add("viewing");
          stopAudioRecording();
          return;
+       } else if (OUTPUT.classList.contains("viewing")) {
+         OUTPUT.classList.remove("viewing");
        }
 
 
@@ -978,6 +978,8 @@
                     INPUT.classList.remove("loading");
                     INPUT.classList.remove("loadingmore");
 
+                    window.onresize = resizeCallback;
+
                     setTimeout( () => {
                       captureFrames();
                     }, 300);
@@ -1017,13 +1019,14 @@
        document.documentElement.style.setProperty("--vidHeight", `${videoHeight}px`);
      }
 
-     window.onresize = () => {
+
+     function resizeCallback() {
        INPUT.style.transition = "none";
        RECORD.parentNode.style.transition = "none";
        resizeInput();
        INPUT.style.transition = "";
        RECORD.parentNode.style.transition = "";
-     };
+     }
      
      document.querySelectorAll("button").forEach(b => {
        b.addEventListener("pointerdown", (event) => {
