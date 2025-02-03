@@ -4,7 +4,7 @@
     <head>
         
         <title>translateASL</title>
-        <link rel="icon" type="image/svg" href="ASL.svg">
+        <link rel="icon" type="image/svg" href="assets/ASL.svg">
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,initial-scale=1, interactive-widget=resizes-content">
@@ -19,17 +19,14 @@
     </head>
 
     <style>
-
      
      :root {
        --inputMode: "Speech";
        --inputDesc: "Speak into the mic...";
        --inputPrompt: "Begin recording";
-       --outputDesc: "...and see your words signed!";
+
        --outputMode: "Gestures";
-
-
-       --slBack: 2rem;
+       --outputDesc: "...and see your words signed!";
      }
      
      body {
@@ -49,131 +46,122 @@
        font-weight: 100;
        font-size: 2.7rem;
        position: relative;
-       padding:0;
+       padding: 0;
        margin: 0;
        margin-top: 1.9vh;
-       transition: right 1.5s;
+       transition: right 1.75s;
        right: 0;
-
-       span {display: inline-block}
-       span.upper {
-         font-weight: 470;
-         position: relative;
-         color: transparent;
-         &::before {
-           content: attr(data-val);
-           position: absolute;
-           color: black;
-           font-weight: 470;
-         }
-       }
+       cursor: pointer;
      }
-     #title.magic {
 
-       right: calc(0.5 * (var(--bigA) + var(--bigS) + var(--bigL)));
+     span {
+       display: inline-block;
+       transition: min-width 1.75s, color 1.75s, left 1.75s;
+     }
+
+     span.upper {
+       font-weight: 470;
+       position: relative;
+     }
+
+     span.upper::before {
+       content: attr(data-val);
+       position: absolute;
+       color: black;
+       font-weight: 470;
+       left: 0;
+       transition: left 1.75s;
+     }
+
+     #title.computed {
        span:nth-of-type(3) {
-         animation: shrinkInA 2s forwards;
-         &::before {
-           animation: goA 2s forwards; 
-         }
+         min-width: var(--bigA);
+         color: transparent;
        }
        span:nth-of-type(5) {
-         animation: shrinkInS 2s forwards;
-         &::before {
-           animation: goS 2s  forwards; 
-         }
+         min-width: var(--bigS);
+         color: transparent;
        }
        span:nth-of-type(6) {
-         animation: shrinkInL 2s forwards;
-         &::before {
-           animation: goL 2s forwards;
-         }
+         min-width: var(--bigL);
+         color: transparent;
        }
-     }
-     
 
-     @keyframes shrinkInA {
-       from { min-width: var(--bigA); color: transparent;}
-       to {min-width: var(--smallA); color: black;}
-     }
-     @keyframes shrinkInS {
-       from { min-width: var(--bigS); color: transparent;}
-       to {min-width: var(--smallS); color: black;}
-     }
-     @keyframes shrinkInL {
-       from { min-width: var(--bigL); color: transparent;}
-       to {min-width: var(--smallL); color: black; }
      }
 
-     @keyframes goA {
-       from {left: 0;}
-       to {left: var(--aForward);}
+     #title.magic {
+       right: calc(0.5 * (var(--bigA) + var(--bigS) + var(--bigL)));
      }
 
-     @keyframes goS {
-       from {left: 0;}
-       to {left: calc(var(--sForward));}
-     }
-     @keyframes goL {
-       from {left: 0;}
-       to {left: calc(var(--lForward));}
+     #title.magic span:nth-of-type(3) {
+       min-width: var(--smallA);
+       color: black;
      }
 
+     #title.magic span:nth-of-type(3)::before {
+       left: var(--aForward);
+     }
 
-     /*&::before {
-        content: "";
-        width: 75%;
-        height: 103%;
-        border-bottom: 1px solid black;
-        position: absolute;
-        left: 12.5%;
-        border-radius: 1px;
-        }
-      */
-     
+     #title.magic span:nth-of-type(5) {
+       min-width: var(--smallS);
+       color: black;
+     }
 
-     
+     #title.magic span:nth-of-type(5)::before {
+       left: var(--sForward);
+     }
 
-     #input::before, #output::before {
+     #title.magic span:nth-of-type(6) {
+       min-width: var(--smallL);
+       color: black;
+     }
+
+     #title.magic span:nth-of-type(6)::before {
+       left: var(--lForward);
+     }
+
+
+
+     #input::before, #output::before,
+     #input::after, #output::after {
        position: absolute;
-       top: calc(-3rem - 1vh);
-       font-size: 1.8rem;
-       font-weight: 425;
-       width: min-content;
        margin: 0;
        font-family: Fraunces;
        transition: transform 0.4s;
        z-index: -2;
      }
 
+     /* stream headers */
+     #input::before, #output::before {
+       top: calc(-3rem - 1vh);
+       font-size: 1.8rem;
+       font-weight: 425;
+       width: min-content;
+     }
+
+     /* stream info */
      #input::after, #output::after {
-       position: absolute;
        top: calc(-1rem - 1vh);
        font-size: 1rem;
        font-weight: 150;
        font-style: italic;
        white-space: nowrap;
        width: auto;
-       margin: 0;
-       font-family: Fraunces;
-       transition: transform 0.4s;
-       z-index: -2;
      }
-
-     #input.swapout::before, #input.swapout::after {
-       transform: translateY(4rem) rotate(-20deg);
-     }
-
-     #output.swapout::before, #output.swapout::after  {
-       transform: translateY(4rem) rotate(20deg);
-     }
-     
 
      #input::before {content: var(--inputMode); }
      #input::after {content: var(--inputDesc); }
      #output::before {content: var(--outputMode);}
      #output::after {content: var(--outputDesc); }
      
+     #input.swapout::before, #input.swapout::after {
+       transform: translateY(4.5rem) rotate(-20deg);
+     }
+
+     #output.swapout::before, #output.swapout::after  {
+       transform: translateY(4.5rem) rotate(20deg);
+     }
+
      #wrap-convert {
        display: flex;
        flex-direction: row;
@@ -189,18 +177,19 @@
 
      #swap {
        width: 40px;
-       opacity: 0.8;
+       opacity: 0.9;
        cursor: pointer;
        background-image: url("assets/SWAP.svg");
        background-size: 100%;
+       background-repeat: no-repeat;
        height: 53.5px;
        padding: 0;
        background-color: transparent;
        border: 0;
-       transition: opacity 0.1s;
+       transition: filter 0.15s, scale 0.1s;
 
        &:hover {
-         opacity: 0.5;
+         filter: drop-shadow(2px 2px 1px #bbb);
        }
      }
 
@@ -212,7 +201,6 @@
        border: 1px solid #C3C3C3;
        box-shadow: 0 0 3px #f4f4f4, 0 0 2px #f0f0f0, 0 0 1px #e5e5e5;
 
-       background: #FBFBFB;
        padding: 1vmin;
 
        box-sizing: border-box;
@@ -224,63 +212,17 @@
        align-items: center;
      }
 
+     #input {
+       background-color: #FBFBFB;
+
+     }
      #output {
        background-color: #EEE;
      }
 
      
-     #input.loading #recordprompt {
-       &::after { transition: opacity 0.1s; opacity: 0; }
 
-       #record {
-         animation: waiting 0.9s infinite;
-       }
-     }
-
-     #input.loadingmore #recordprompt::after {
-       opacity: 1;
-     }
-
-     .speechgestures .recording #record {
-       animation: wiggle 1.6s infinite !important;
-     }
-
-     @keyframes wiggle {
-       0% {rotate: 0;}
-       25% {rotate: 3deg;}
-       50% {rotate: 0deg;}
-       75% {rotate: -3deg;}
-       100% {rotate: 0deg}
-     }
      
-     
-     .gesturesspeech #input.recording #recordprompt {
-       position: absolute;
-       flex-direction: row;
-       top: calc(clamp(1rem, 2vh + 1vw, 1.7rem) + var(--vidHeight));
-       
-       #record {
-         width: 33px;
-         height: 33px;
-
-         &::before {
-           border-radius: 1.5px;
-         }
-       }
-
-       &::after {opacity: 0; animation: bringStopPrompt 0.2s 0.2s forwards; }
-     }
-     @keyframes waiting {
-       0% {scale: 1;}
-       50% {scale: 0.85;}
-       100% {scale: 1;}
-     }
-
-     @keyframes bringStopPrompt {
-       from {opacity: 0;}
-       to {opacity: 1;}
-     }
-
      #recordprompt {
        position: absolute;
        top: 50%;
@@ -288,12 +230,11 @@
        display: flex;
        flex-direction: column;
        align-items: center;
-       gap: 1vh;
+       gap: 0.5vh;
 
        z-index: 2;
 
        transition: top 0.38s ease-out;
-       
        
        &::after {
          content: var(--inputPrompt);
@@ -303,27 +244,36 @@
 
          font-family: Fraunces;
        }
-       
      }
 
+     .prompt::after {
+       font-weight: 300;
+       font-size: 1rem;
+       margin: 0;
+       color: #888;
+       opacity: 1;
+       transition: opacity 0.2s ease-out;
+     }
 
-     .gesturesspeech #record {
+     #record {
        padding: 0;
        border: 0;
        background: transparent;
-       border: 3px solid black;
-       border-radius: 50%;
-
        cursor: pointer;
+       position: relative;
+     }
+     
+     .gesturesspeech #record {
        width: 50px;
        height: 50px;
-       transition: transform 0.1s, top 0.4s, width 0.2s, height 0.2s, opacity 0.4s;
+       border: 3px solid black;
+       border-radius: 50%;
+       
+       transition: scale 0.1s, top 0.4s, opacity 0.4s;
 
        display: flex;
        justify-content: center;
        align-items: center;
-
-       position: relative;
 
        &:hover::before, &:active::before {
          width: 65%;
@@ -340,7 +290,7 @@
 
          position: relative;
 
-         transition: transform 0.1s, width 0.1s ease-out, height 0.1s ease-out;
+         transition: scale 0.1s, width 0.1s ease-out, height 0.1s ease-out;
        }
      }
 
@@ -349,42 +299,139 @@
        background-size: 100%;
        width: 31.5px;
        height: 50px;
-       padding: 0;
-       border: 0;
-       cursor: pointer;
-       transition: opacity 0.4s, filter 0.1s;
        
-       &:hover {
-         filter: invert(0.3);
+       transition: opacity 0.4s, filter 0.1s;
+
+       &::after {
+         position: absolute;
+         content: "";
+         top: 0;
+         left: 0;
+         right: 0;
+         z-index: -1;
+         height: 100%;
+         width: 100%;
+         transform: scale(0) translateZ(0);
+         filter: blur(15px);
+         background: linear-gradient(
+           to left,
+           #001F54,  
+           #023E8A,  
+           #3A0CA3,  
+           #7209B7,  
+           #B5179E,  
+           #7209B7,  
+           #3A0CA3,  
+           #023E8A,  
+           #001F54    
+         );
+         transition: transform 0.15s ease-out;
+
+         background-size: 200% 200%;
+         animation: animateGlow 2s linear infinite;
+       }
+       
+       &:hover::after {
+         transform: scale(0.55) translateZ(0);
        }
      }
 
-     .swapout #record {
-       opacity: 0;
+     
+     .speechgestures .recording #record {
+       &::after {
+         transform: scale(0.8) translateZ(0);
+       }
+     }
+     
+     @keyframes animateGlow {
+       0% {
+         background-position: 0% 50%;
+       }
+       100% {
+         background-position: 200% 50%;
+       }
      }
 
 
-     #hands, #waveform {position: absolute; top: 50%; transform: translateY(-50%); display: none; transition: opacity 0.4s; }
+     @keyframes waiting {
+       0% {scale: 1;}
+       50% {scale: 0.85;}
+       100% {scale: 1;}
+     }
+     
+     #input.loading {
+       #recordprompt {
+         &::after { transition: opacity 0.1s; opacity: 0; }
+         #record {
+           animation: waiting 0.9s infinite;
+         }
+       }
 
-     .swapout #hands, .swapout #waveform { opacity: 0 !important; }
+       &.loadingmore #recordprompt::after {
+         opacity: 1;
+       }
+     }
+     
+     .gesturesspeech #input.recording #recordprompt {
+       position: absolute;
+       flex-direction: row;
+       top: calc(clamp(1rem, 2vh + 1vw, 1.7rem) + var(--vidHeight));
+       
+       #record {
+         width: 33px;
+         height: 33px;
+
+         &::before {
+           border-radius: 1.5px;
+         }
+       }
+
+       &::after {
+         opacity: 0;
+         animation: bringStopPrompt 0.2s 0.26s forwards;
+       }
+     }
+     
+     @keyframes bringStopPrompt {
+       from {opacity: 0;}
+       to {opacity: 1;}
+     }
+
+     #hands, #waveform {
+       position: absolute;
+       top: 50%;
+       transform: translateY(-50%);
+       display: none;
+       transition: opacity 0.4s;
+     }
+
      .gesturesspeech #waveform {
        display: block;
        
-       width: 60px;
-       opacity: 0.7;
+       width: 75px;
+       opacity: 0.3;
      }
 
      .speechgestures #hands {
        display: block;
        
-       width: 60px;
-       opacity: 0.7;
+       width: 90px;
+       opacity: 0.3;
      }
 
-     .recording #waveform, .viewing #waveform, .recording #hands,.viewing #hands {
+     .recording #waveform, .viewing #waveform,
+     .recording #hands, .viewing #hands {
        opacity: 0;
      }
+     
 
+     .swapout {
+       #hands, #waveform, #record, #signbox, #text, #playprompt {
+         opacity: 0 !important;
+       }
+     }
+
+     
      #playprompt {
        margin-top: auto;
        display: flex;
@@ -392,49 +439,37 @@
        align-items: center;
        gap: 1vh;
 
-       display: none;   
+       display: none;
+       transition: opacity 0.4s;
+
+       #play {
+         padding: 0;
+         border: 0;
+         background: url("assets/VOLUME.svg");
+         background-size: 100%;
+
+         cursor: pointer;
+         opacity: 0.8;
+         width: 30px;
+         height: 30px;
+
+         transition: transform 0.1s;
+
+       }
      }
 
      .viewing #playprompt, .recordingcontent #playprompt {
        display: block;
      }
-
-
-     .prompt::after {
-       font-weight: 300;
-       font-size: 0.85rem;
-       margin: 0;
-       color: #888;
-       opacity: 1;
-       transition: opacity 0.2s ease-out;
-       
-     }
+     
 
      
-     
-     #play {
-       padding: 0;
-       border: 0;
-       background: url("assets/VOLUME.svg");
-       background-size: 100%;
-
-       cursor: pointer;
-       opacity: 0.8;
-       width: 30px;
-       height: 30px;
-
-       transition: transform 0.1s;
-
-     }
-     
-     .nudged, .nudged::after, .nudged::before {
-       transform: scale(0.95);
-     }
-     
-     video {
+     #livevid {
        display: none;
        filter: grayscale(0); /* prevents black line */
      }
+
+     
      .gesturesspeech #input.recording {
        transition: max-height 0.25s ease-out, max-width 0.25s ease-out;
        max-height: var(--vidHeight);
@@ -451,8 +486,6 @@
            opacity: 0;
          }
        }
-
-       
      }
 
      #text { display: none;}
@@ -463,13 +496,10 @@
        text-align: center;
        margin-bottom: auto;
        word-break: break-all;
+       transition: opacity 0.4s;
      }
 
      #signbox { display: none; }
-
-     .swapout #signbox {
-       opacity: 0;
-     }
 
      .speechgestures .recording #signbox, .speechgestures .viewing #signbox {
        display: flex;
@@ -508,10 +538,17 @@
            position: absolute;
            font-size: 1.2rem;
            font-weight: 520;
-           bottom: -1rem;
+           bottom: -1.3rem;
            
          }
        }
+     }
+
+
+
+
+     .nudged, .nudged::after, .nudged::before {
+       scale: 0.95;
      }
     </style>
 
@@ -565,6 +602,9 @@
      const TITLE = document.getElementById("title");
      const SPANS = TITLE.querySelectorAll("span");
 
+     TITLE.onclick = () => {
+       TITLE.classList.toggle("magic");
+     };
      
      let nMap = new Map();
      let gapMap = new Map();
@@ -606,6 +646,8 @@
        [sArray[2], sArray[4], sArray[5]].forEach( s => { document.documentElement.style.setProperty(`--small${s.innerText.toUpperCase()}`, `${gapMap.get(s)}px`);
        });
 
+       TITLE.classList.add("computed");
+
 
 
        sForward += bigGapMap.get("A");
@@ -619,9 +661,11 @@
        document.documentElement.style.setProperty("--lForward", `${lForward}px`);
 
 
-       TITLE.classList.add("magic");
-       
-     }, 800);
+       setTimeout( () => {
+         TITLE.classList.add("magic");
+       }, 20);
+
+     }, 1500);
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
@@ -746,18 +790,20 @@
        INPUT.classList.remove("swapout");
        OUTPUT.classList.remove("swapout");
 
+       OUTPUT.classList.remove("viewing");
+
+
        INPUT.removeEventListener("transitionend", swapTitles);
      }
      
      SWAP.onclick = () => {
-       OUTPUT.classList.remove("viewing");
-
        if (INPUT.classList.contains("recording") && WRAP.classList.contains("gesturesspeech")) {
          stopVideoRecording();
        } else if (INPUT.classList.contains("recording")) {
          stopAudioRecording();
        }
        
+
        INPUT.classList.add("swapout");
        OUTPUT.classList.add("swapout");
 
@@ -857,6 +903,7 @@
        if (WRAP.classList.contains("speechgestures")) {
          recognition.start();
 
+         SIGNBOX.innerHTML ="";
          INPUT.classList.add("recording");
          OUTPUT.classList.add("recording");
 
@@ -923,6 +970,8 @@
                     
                     VIDEO.srcObject = stream;
                     document.documentElement.style.setProperty("--inputPrompt", "'Stop recording'");
+                    TEXT.innerText = "";
+                    
                     INPUT.classList.add("recording");
                     OUTPUT.classList.add("recording");
 
