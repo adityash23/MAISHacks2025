@@ -1,6 +1,6 @@
 # MAISHacks2025
 
-1st Place Winner of MAIS Hacks 2025
+## 1st Place Winner of MAIS Hacks 2025
 
 Try it yourself: [https://github.com/dpbarry/translateASL/settings/pages](https://dpbarry.github.io/translateASL/)
 
