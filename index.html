@@ -632,9 +632,11 @@
        transition: opacity 0.4s;
      }
 
-     .gesturesspeech + #warning {
+     .gesturesspeech:not(:has(.recording, .viewing)) + #warning {
        opacity: 1;
      }
+
+     
      
      @keyframes dot-flashing {
        0% {
@@ -955,6 +957,8 @@
          if (TEXT.innerText.trim().length > 0) {
            INPUT.classList.add("viewing");
            OUTPUT.classList.add("viewing");
+         } else {
+           OUTPUT.classList.remove("loading");
          }
          document.documentElement.style.setProperty("--vidWidth", `40vw`);
          document.documentElement.style.setProperty("--vidHeight", `60vh`);
