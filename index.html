@@ -12,9 +12,7 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap" rel="preload">
 
-        <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap" rel="preload">
         <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap" rel="stylesheet">
 
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap" rel="stylesheet">
@@ -219,7 +217,7 @@
 
      #input {
        background-color: #FBFBFB;
-
+       transition: max-height 0.25s ease-out, max-width 0.25s ease-out;
      }
      #output {
        background-color: #EEE;
@@ -484,7 +482,6 @@
        from {opacity: 0} to {opacity: 1}
      }
      
-
      
      #livevid {
        display: none;
@@ -493,7 +490,6 @@
 
      
      .gesturesspeech #input.recording, .gesturesspeech #input.viewing {
-       transition: max-height 0.25s ease-out, max-width 0.25s ease-out;
        max-height: var(--vidHeight);
        max-width: var(--vidWidth);
      }
@@ -1068,6 +1064,7 @@
      let launchCapture;
 
      function beginVideoRecording() {
+       INPUT.classList.remove("viewing");
        INPUT.classList.add("loading");
        OUTPUT.classList.add("loading");
 
